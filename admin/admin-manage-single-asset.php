@@ -1,0 +1,185 @@
+<?php
+  session_start();
+  include('vendor/inc/config.php');
+  include('vendor/inc/checklogin.php');
+  check_login();
+  $aid=$_SESSION['a_id'];
+  //Add asset
+  if(isset($_POST['update_assets']))
+    {
+            $k_id = $_GET['k_id'];
+            $k_keyname=$_POST['k_keyname'];
+            $k_category = $_POST['k_category'];
+            $k_year = $_POST['k_year'];
+            $k_status=$_POST['k_status'];
+            $query="update db_key set k_keyname=?, k_year=?, k_category=?, k_status=? where k_id = ?";
+            $stmt = $mysqli->prepare($query);
+            $rc=$stmt->bind_param('ssssi', $k_keyname, $k_year, $k_category, $k_status, $k_id);
+            $stmt->execute();
+                if($stmt)
+                {
+                    $succ = "Assets Updated";
+                }
+                else 
+                {
+                    $err = "Please Try Again Later";
+                }
+            }
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<?php include('vendor/inc/head.php');?>
+
+<body id="page-top">
+ <!--Start Navigation Bar-->
+  <?php include("vendor/inc/nav.php");?>
+  <!--Navigation Bar-->
+
+  <div id="wrapper">
+
+    <!-- Sidebar -->
+    <?php include("vendor/inc/sidebar.php");?>
+    <!--End Sidebar-->
+    <div id="content-wrapper">
+
+      <div class="container-fluid">
+      <?php if(isset($succ)) {?>
+                        <!--This code for injecting an alert-->
+        <script>
+                    setTimeout(function () 
+                    { 
+                        swal("Success!","<?php echo $succ;?>!","success");
+                    },
+                        100);
+        </script>
+
+        <?php } ?>
+        <?php if(isset($err)) {?>
+        <!--This code for injecting an alert-->
+        <script>
+                    setTimeout(function () 
+                    { 
+                        swal("Failed!","<?php echo $err;?>!","Failed");
+                    },
+                        100);
+        </script>
+
+        <?php } ?>
+
+        <!-- Breadcrumbs-->
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="#">Assets</a>
+          </li>
+          <li class="breadcrumb-item active">Update Asset</li>
+        </ol>
+        <hr>
+        <div class="card">
+        <div class="card-header">
+            Update Asset
+        </div>
+        <div class="card-body">
+          <!--Add User Form-->
+          <?php
+            $aid=$_GET['k_id'];
+            $ret="select * from db_key where k_id=?";
+            $stmt= $mysqli->prepare($ret) ;
+            $stmt->bind_param('i',$aid);
+            $stmt->execute() ;//ok
+            $res=$stmt->get_result();
+            //$cnt=1;
+            while($row=$res->fetch_object())
+        {
+        ?>
+          <form method ="POST" enctype="multipart/form-data"> 
+            <div class="form-group">
+                <label for="exampleInputEmail1">Plate</label>
+                <input type="text" value="<?php echo $row->k_keyname;?>" required class="form-control" id="exampleInputEmail1" name="k_keyname">
+            </div>
+            
+            <div class="form-group">
+              <label for="exampleFormControlSelect1">Model</label>
+              <input type="text" value="<?php echo $row->k_category;?>" required class="form-control" id="exampleInputEmail1" name="k_category">
+            </div>
+
+            <div class="form-group">
+              <label for="exampleFormControlSelect1">Year</label>
+              <input type="text" value="<?php echo $row->k_year;?>" required class="form-control" id="exampleInputEmail1" name="k_year">
+            </div>
+
+            <div class="form-group">
+              <label for="exampleFormControlSelect1">Status</label>
+              <select class="form-control" name="k_status" id="exampleFormControlSelect1">
+                <option>Not Available</option>
+                <option>Available</option>
+              </select>
+            </div>
+            <hr>
+            <button type="submit" name="update_assets" class="btn btn-success">Update Asset</button>
+          </form>
+          <!-- End Form-->
+          <?php }?>
+        </div>
+      </div>
+       
+      <hr>
+     
+
+      <!-- Sticky Footer -->
+      <?php include("vendor/inc/footer.php");?>
+
+    </div>
+    <!-- /.content-wrapper -->
+
+  </div>
+  <!-- /#wrapper -->
+
+  <!-- Scroll to Top Button-->
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+  </a>
+
+  <!-- Logout Modal-->
+  <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+          <a class="btn btn-danger" href="admin-logout.php">Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap core JavaScript-->
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Core plugin JavaScript-->
+  <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+  <!-- Page level plugin JavaScript-->
+  <script src="vendor/chart.js/Chart.min.js"></script>
+  <script src="vendor/datatables/jquery.dataTables.js"></script>
+  <script src="vendor/datatables/dataTables.bootstrap4.js"></script>
+
+  <!-- Custom scripts for all pages-->
+  <script src="vendor/js/sb-admin.min.js"></script>
+
+  <!-- Demo scripts for this page-->
+  <script src="vendor/js/demo/datatables-demo.js"></script>
+  <script src="vendor/js/demo/chart-area-demo.js"></script>
+ <!--INject Sweet alert js-->
+ <script src="vendor/js/swal.js"></script>
+
+</body>
+
+</html>
